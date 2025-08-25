@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<title>Тоо таах тоглоом 🎉</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+  input { width: 50px; text-align: center; }
+  button { padding: 5px 10px; margin-left: 10px; }
+  #result { margin-top: 20px; font-size: 18px; }
+  canvas { position: fixed; top: 0; left: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<h1>Тоо таах тоглоомд тавтай морил, Hanbu! 🎮</h1>
+<p>1-10 хүртэл нэг тоо таа:</p>
+<input type="number" id="guess" min="1" max="10">
+<button onclick="checkGuess()">Таа</button>
+
+<div id="result"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+let secret = Math.floor(Math.random() * 10) + 1;
+let attempts = 0;
+
+function checkGuess() {
+  let guess = parseInt(document.getElementById("guess").value);
+  attempts++;
+  let result = document.getElementById("result");
+
+  if (guess < secret) {
+    result.textContent = "Бага байна! 😎";
+  } else if (guess > secret) {
+    result.textContent = "Их байна! 😮";
+  } else if (guess === secret) {
+    result.textContent = `Баяр хүргэе! 🎉 Та ${attempts} оролдлогоор онослоо!`;
+    startConfetti();
+  } else {
+    result.textContent = "Зөв тоо оруулна уу!";
+  }
+}
+
+// Confetti animation
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let confettiParticles = [];
+
+function createConfetti() {
+  for (let i = 0; i < 150; i++) {
+    confettiParticles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 30 + 10,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      tilt: Math.random() * 10 - 10,
+      tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+      tiltAngle: 0
+    });
+  }
+}
+
+function drawConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  confettiParticles.forEach(p => {
+    ctx.beginPath();
+    ctx.lineWidth = p.r / 2;
+    ctx.strokeStyle = p.color;
+    ctx.moveTo(p.x + p.tilt + p.r / 4, p.y);
+    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 4);
+    ctx.stroke();
+  });
+  updateConfetti();
+}
+
+function updateConfetti() {
+  confettiParticles.forEach(p => {
+    p.tiltAngle += p.tiltAngleIncremental;
+    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+    p.x += Math.sin(p.d);
+    p.tilt = Math.sin(p.tiltAngle) * 15;
+
+    if (p.y > canvas.height) {
+      p.x = Math.random() * canvas.width;
+      p.y = -10;
+    }
+  });
+}
+
+let confettiInterval;
+function startConfetti() {
+  createConfetti();
+  confettiInterval = setInterval(drawConfetti, 20);
+  setTimeout(() => { clearInterval(confettiInterval); confettiParticles = []; ctx.clearRect(0, 0, canvas.width, canvas.height); }, 5000);
+}
+</script>
+
+</body>
+</html>
